@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo List — Test</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>Todo List</h1>
+      <p class="subtitle">Testing playground</p>
+    </header>
+
+    <form class="add-form" id="addForm">
+      <input
+        type="text"
+        id="todoInput"
+        placeholder="What needs to be done?"
+        autocomplete="off"
+        maxlength="200"
+      />
+      <button type="submit">Add</button>
+    </form>
+
+    <div class="toolbar">
+      <div class="filters" role="tablist">
+        <button type="button" class="filter active" data-filter="all">All</button>
+        <button type="button" class="filter" data-filter="active">Active</button>
+        <button type="button" class="filter" data-filter="completed">Done</button>
+      </div>
+      <span class="count" id="itemCount">0 items</span>
+    </div>
+
+    <ul class="todo-list" id="todoList"></ul>
+
+    <footer class="footer">
+      <button type="button" class="clear-btn" id="clearCompleted" hidden>
+        Clear completed
+      </button>
+      <p class="hint">Data is saved in your browser (localStorage)</p>
+    </footer>
+  </div>
+
+  <template id="todoTemplate">
+    <li class="todo-item">
+      <label class="todo-label">
+        <input type="checkbox" class="todo-check" />
+        <span class="todo-text"></span>
+      </label>
+      <button type="button" class="delete-btn" aria-label="Delete">×</button>
+    </li>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
