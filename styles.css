@@ -15,8 +15,8 @@
   --border: #2a3544;
   --text: #eef2f7;
   --text-muted: #8b9cb3;
-  --accent: #ef4444;
-  --accent-hover: #dc2626;
+  --accent: #8b5cf6;
+  --accent-hover: #7c3aed;
   --success: #3dd68c;
   --danger: #f07178;
   --warning: #f5a623;
@@ -25,7 +25,7 @@
   --priority-low: #6b8cae;
   --priority-medium: #f5a623;
   --priority-high: #f07178;
-  --cat-work: #ef4444;
+  --cat-work: #8b5cf6;
   --cat-personal: #a78bfa;
   --cat-shopping: #3dd68c;
   --cat-other: #8b9cb3;
@@ -39,8 +39,8 @@
   --border: #d8e0ea;
   --text: #1a2330;
   --text-muted: #64748b;
-  --accent: #dc2626;
-  --accent-hover: #b91c1c;
+  --accent: #7c3aed;
+  --accent-hover: #6d28d9;
   --shadow: 0 16px 48px rgba(15, 23, 42, 0.08);
 }
 
@@ -48,8 +48,8 @@ body {
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
   background: var(--bg);
   background-image:
-    radial-gradient(ellipse at 10% 0%, rgba(239, 68, 68, 0.14), transparent 45%),
-    radial-gradient(ellipse at 90% 100%, rgba(248, 113, 113, 0.08), transparent 45%);
+    radial-gradient(ellipse at 10% 0%, rgba(139, 92, 246, 0.14), transparent 45%),
+    radial-gradient(ellipse at 90% 100%, rgba(167, 139, 250, 0.08), transparent 45%);
   color: var(--text);
   min-height: 100vh;
   line-height: 1.5;
@@ -108,7 +108,7 @@ body {
   display: grid;
   place-items: center;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), #b91c1c);
+  background: linear-gradient(135deg, var(--accent), #6d28d9);
   font-weight: 700;
   font-size: 1.125rem;
 }
@@ -229,7 +229,7 @@ body {
 .category-chip.active {
   border-color: var(--accent);
   color: var(--accent);
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(139, 92, 246, 0.1);
 }
 
 .filters {
@@ -259,8 +259,8 @@ body {
 }
 
 .filter.active {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(139, 92, 246, 0.12);
+  border-color: rgba(139, 92, 246, 0.35);
   color: var(--text);
 }
 
@@ -273,7 +273,7 @@ body {
 }
 
 .filter.active .filter-count {
-  background: rgba(239, 68, 68, 0.2);
+  background: rgba(139, 92, 246, 0.2);
   color: var(--accent);
 }
 
@@ -560,7 +560,7 @@ body {
   font-weight: 600;
   padding: 0.125rem 0.5rem;
   border-radius: 999px;
-  background: rgba(239, 68, 68, 0.12);
+  background: rgba(139, 92, 246, 0.12);
   color: var(--cat-color, var(--cat-other));
 }
 
@@ -569,7 +569,7 @@ body {
 .todo-item.category-shopping { --cat-color: var(--cat-shopping); }
 .todo-item.category-other { --cat-color: var(--cat-other); }
 
-.todo-item.category-work .category-badge { background: rgba(239, 68, 68, 0.15); }
+.todo-item.category-work .category-badge { background: rgba(139, 92, 246, 0.15); }
 .todo-item.category-personal .category-badge { background: rgba(167, 139, 250, 0.15); }
 .todo-item.category-shopping .category-badge { background: rgba(61, 214, 140, 0.15); }
 .todo-item.category-other .category-badge { background: rgba(139, 156, 179, 0.15); }
@@ -579,7 +579,7 @@ body {
   font-weight: 600;
   padding: 0.125rem 0.5rem;
   border-radius: 999px;
-  background: rgba(239, 68, 68, 0.12);
+  background: rgba(139, 92, 246, 0.12);
   color: var(--accent);
 }
 
