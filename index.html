@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,12 +9,15 @@
 <body>
   <div class="layout">
     <aside class="sidebar">
-      <div class="brand">
-        <span class="brand-icon">✓</span>
-        <div>
-          <h1>Task Board</h1>
-          <p class="subtitle">Testing playground</p>
+      <div class="brand-row">
+        <div class="brand">
+          <span class="brand-icon">✓</span>
+          <div>
+            <h1>Task Board</h1>
+            <p class="subtitle">Testing playground</p>
+          </div>
         </div>
+        <button type="button" class="theme-btn" id="themeToggle" aria-label="Toggle theme">☀</button>
       </div>
 
       <div class="stats-card">
@@ -35,6 +38,7 @@
             <span class="stat-label">Done</span>
           </div>
         </div>
+        <p class="overdue-note" id="overdueNote" hidden></p>
       </div>
 
       <nav class="filters" role="tablist" aria-label="Filter tasks">
@@ -50,13 +54,24 @@
           <span>Completed</span>
           <span class="filter-count" id="countCompleted">0</span>
         </button>
+        <button type="button" class="filter" data-filter="pinned">
+          <span>Pinned</span>
+          <span class="filter-count" id="countPinned">0</span>
+        </button>
       </nav>
 
+      <div class="category-filters" id="categoryFilters">
+        <span class="category-label">Categories</span>
+      </div>
+
       <div class="sidebar-actions">
+        <button type="button" class="action-btn" id="completeAll" hidden>
+          Complete all active
+        </button>
         <button type="button" class="clear-btn" id="clearCompleted" hidden>
           Clear completed
         </button>
-        <p class="hint">Saved in your browser</p>
+        <p class="hint">Saved in your browser · <kbd>/</kbd> to search</p>
       </div>
     </aside>
 
@@ -69,6 +84,7 @@
         <select id="sortSelect" class="sort-select" aria-label="Sort tasks">
           <option value="newest">Newest first</option>
           <option value="priority">Priority</option>
+          <option value="due">Due date</option>
           <option value="alpha">A → Z</option>
         </select>
       </header>
@@ -81,11 +97,18 @@
           autocomplete="off"
           maxlength="200"
         />
-        <select id="prioritySelect" class="priority-select" aria-label="Priority">
+        <select id="categorySelect" class="field-select" aria-label="Category">
+          <option value="work">Work</option>
+          <option value="personal">Personal</option>
+          <option value="shopping">Shopping</option>
+          <option value="other">Other</option>
+        </select>
+        <select id="prioritySelect" class="field-select" aria-label="Priority">
           <option value="low">Low</option>
           <option value="medium" selected>Medium</option>
           <option value="high">High</option>
         </select>
+        <input type="date" id="dueDateInput" class="field-date" aria-label="Due date" />
         <button type="submit">Add task</button>
       </form>
 
@@ -102,13 +125,23 @@
     </main>
   </div>
 
+  <div class="toast" id="toast" hidden>
+    <span id="toastMessage">Task deleted</span>
+    <button type="button" id="undoBtn">Undo</button>
+  </div>
+
   <template id="todoTemplate">
     <li class="todo-item">
+      <button type="button" class="pin-btn" aria-label="Pin task" title="Pin task">☆</button>
       <label class="todo-label">
         <input type="checkbox" class="todo-check" />
         <span class="todo-body">
           <span class="todo-text"></span>
-          <span class="priority-badge"></span>
+          <span class="todo-meta">
+            <span class="category-badge"></span>
+            <span class="priority-badge"></span>
+            <span class="due-badge"></span>
+          </span>
         </span>
       </label>
       <div class="todo-actions">
