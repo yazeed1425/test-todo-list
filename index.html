@@ -3,53 +3,118 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Todo List — Test</title>
+  <title>Task Board — Test</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="app">
-    <header class="header">
-      <h1>Todo List</h1>
-      <p class="subtitle">Testing playground</p>
-    </header>
-
-    <form class="add-form" id="addForm">
-      <input
-        type="text"
-        id="todoInput"
-        placeholder="What needs to be done?"
-        autocomplete="off"
-        maxlength="200"
-      />
-      <button type="submit">Add</button>
-    </form>
-
-    <div class="toolbar">
-      <div class="filters" role="tablist">
-        <button type="button" class="filter active" data-filter="all">All</button>
-        <button type="button" class="filter" data-filter="active">Active</button>
-        <button type="button" class="filter" data-filter="completed">Done</button>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-icon">✓</span>
+        <div>
+          <h1>Task Board</h1>
+          <p class="subtitle">Testing playground</p>
+        </div>
       </div>
-      <span class="count" id="itemCount">0 items</span>
-    </div>
 
-    <ul class="todo-list" id="todoList"></ul>
+      <div class="stats-card">
+        <div class="progress-ring" id="progressRing" style="--progress: 0">
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="stats-grid">
+          <div class="stat">
+            <span class="stat-value" id="statTotal">0</span>
+            <span class="stat-label">Total</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="statActive">0</span>
+            <span class="stat-label">Active</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="statDone">0</span>
+            <span class="stat-label">Done</span>
+          </div>
+        </div>
+      </div>
 
-    <footer class="footer">
-      <button type="button" class="clear-btn" id="clearCompleted" hidden>
-        Clear completed
-      </button>
-      <p class="hint">Data is saved in your browser (localStorage)</p>
-    </footer>
+      <nav class="filters" role="tablist" aria-label="Filter tasks">
+        <button type="button" class="filter active" data-filter="all">
+          <span>All tasks</span>
+          <span class="filter-count" id="countAll">0</span>
+        </button>
+        <button type="button" class="filter" data-filter="active">
+          <span>Active</span>
+          <span class="filter-count" id="countActive">0</span>
+        </button>
+        <button type="button" class="filter" data-filter="completed">
+          <span>Completed</span>
+          <span class="filter-count" id="countCompleted">0</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-actions">
+        <button type="button" class="clear-btn" id="clearCompleted" hidden>
+          Clear completed
+        </button>
+        <p class="hint">Saved in your browser</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="main-header">
+        <div>
+          <h2 id="panelTitle">All tasks</h2>
+          <p class="main-subtitle" id="itemCount">0 items left</p>
+        </div>
+        <select id="sortSelect" class="sort-select" aria-label="Sort tasks">
+          <option value="newest">Newest first</option>
+          <option value="priority">Priority</option>
+          <option value="alpha">A → Z</option>
+        </select>
+      </header>
+
+      <form class="add-form" id="addForm">
+        <input
+          type="text"
+          id="todoInput"
+          placeholder="Add a new task..."
+          autocomplete="off"
+          maxlength="200"
+        />
+        <select id="prioritySelect" class="priority-select" aria-label="Priority">
+          <option value="low">Low</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High</option>
+        </select>
+        <button type="submit">Add task</button>
+      </form>
+
+      <div class="search-wrap">
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="Search tasks..."
+          autocomplete="off"
+        />
+      </div>
+
+      <ul class="todo-list" id="todoList"></ul>
+    </main>
   </div>
 
   <template id="todoTemplate">
     <li class="todo-item">
       <label class="todo-label">
         <input type="checkbox" class="todo-check" />
-        <span class="todo-text"></span>
+        <span class="todo-body">
+          <span class="todo-text"></span>
+          <span class="priority-badge"></span>
+        </span>
       </label>
-      <button type="button" class="delete-btn" aria-label="Delete">×</button>
+      <div class="todo-actions">
+        <button type="button" class="edit-btn" aria-label="Edit">Edit</button>
+        <button type="button" class="delete-btn" aria-label="Delete">Delete</button>
+      </div>
     </li>
   </template>
 
