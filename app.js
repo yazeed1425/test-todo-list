@@ -17,6 +17,7 @@ const FILTER_TITLES = {
   pinned: "Pinned tasks",
   "due-today": "Due today",
   overdue: "Overdue tasks",
+  "high-priority": "High priority",
 };
 
 let todos = loadTodos();
@@ -100,14 +101,18 @@ function loadTodos() {
 }
 
 function normalizeTodos(list) {
-  return list.map((todo) => ({
-    ...todo,
-    priority: todo.priority || "medium",
-    category: todo.category || "other",
-    pinned: Boolean(todo.pinned),
-    dueDate: todo.dueDate || null,
-    createdAt: todo.createdAt || Date.now(),
-  }));
+  if (!Array.isArray(list)) return [];
+  return list
+    .filter((todo) => todo && typeof todo.text === "string" && todo.text.trim())
+    .map((todo) => ({
+      ...todo,
+      text: todo.text.trim(),
+      priority: todo.priority || "medium",
+      category: todo.category || "other",
+      pinned: Boolean(todo.pinned),
+      dueDate: todo.dueDate || null,
+      createdAt: todo.createdAt || Date.now(),
+    }));
 }
 
 function saveTodos() {
@@ -172,9 +177,11 @@ function formatDueDate(dueDate) {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-function isDuplicateTask(text) {
+function isDuplicateTask(text, ignoreId = null) {
   const normalized = text.trim().toLowerCase();
-  return todos.some((t) => !t.completed && t.text.trim().toLowerCase() === normalized);
+  return todos.some(
+    (t) => !t.completed && t.id !== ignoreId && t.text.trim().toLowerCase() === normalized
+  );
 }
 
 function getFilteredTodos() {
@@ -184,6 +191,7 @@ function getFilteredTodos() {
     if (filter === "pinned" && !todo.pinned) return false;
     if (filter === "due-today" && !isDueToday(todo)) return false;
     if (filter === "overdue" && !isOverdue(todo)) return false;
+    if (filter === "high-priority" && (todo.completed || todo.priority !== "high")) return false;
     if (categoryFilter !== "all" && todo.category !== categoryFilter) return false;
     return matchesSearch(todo);
   });
@@ -248,6 +256,8 @@ function updateStats() {
   const pinned = todos.filter((t) => t.pinned).length;
   const dueToday = todos.filter(isDueToday).length;
   const overdue = todos.filter(isOverdue).length;
+  const highPriority = todos.filter((t) => !t.completed && t.priority === "high").length;
+  const visible = getFilteredTodos().length;
   const percent = total ? Math.round((done / total) * 100) : 0;
 
   statTotal.textContent = total;
@@ -261,9 +271,14 @@ function updateStats() {
   const countOverdue = document.getElementById("countOverdue");
   if (countDueToday) countDueToday.textContent = dueToday;
   if (countOverdue) countOverdue.textContent = overdue;
+  const countHighPriority = document.getElementById("countHighPriority");
+  if (countHighPriority) countHighPriority.textContent = highPriority;
   progressRing.style.setProperty("--progress", percent);
   progressPercent.textContent = `${percent}%`;
-  itemCount.textContent = `${active} item${active === 1 ? "" : "s"} left`;
+  itemCount.textContent =
+    filter === "all" && !searchQuery && categoryFilter === "all"
+      ? `${active} item${active === 1 ? "" : "s"} left`
+      : `Showing ${visible} of ${total} task${total === 1 ? "" : "s"}`;
   panelTitle.textContent = FILTER_TITLES[filter];
   clearCompleted.hidden = done === 0;
   completeAll.hidden = active === 0;
@@ -355,15 +370,21 @@ function startEdit(item, id, input) {
 
 function finishEdit(id, input, item) {
   if (!item.classList.contains("editing")) return;
-  item.classList.remove("editing");
 
   const trimmed = input.value.trim();
   const todo = todos.find((t) => t.id === id);
   if (!todo || !trimmed) {
     input.value = todo?.text || "";
+    item.classList.remove("editing");
     return;
   }
 
+  if (isDuplicateTask(trimmed, id)) {
+    showToast("An active task with this name already exists");
+    return;
+  }
+
+  item.classList.remove("editing");
   todo.text = trimmed;
   saveTodos();
   render();
@@ -567,7 +588,11 @@ clearCompleted.addEventListener("click", () => {
 });
 
 completeAll.addEventListener("click", () => {
+  const activeCount = todos.filter((t) => !t.completed).length;
+  if (!activeCount) return;
+  if (!confirm(`Mark ${activeCount} active task${activeCount === 1 ? "" : "s"} as complete?`)) return;
   completeAllActive();
+  showToast("All active tasks completed");
 });
 
 undoBtn.addEventListener("click", undoDelete);
