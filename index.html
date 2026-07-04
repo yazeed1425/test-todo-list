@@ -77,6 +77,9 @@
       </div>
 
       <div class="sidebar-actions">
+        <button type="button" class="action-btn" id="clearFilters">
+          Clear all filters
+        </button>
         <button type="button" class="action-btn" id="helpBtn">
           Keyboard shortcuts
         </button>
@@ -146,6 +149,7 @@
           placeholder="Search tasks..."
           autocomplete="off"
         />
+        <button type="button" class="clear-search-btn" id="clearSearch" hidden aria-label="Clear search">×</button>
       </div>
 
       <ul class="todo-list" id="todoList"></ul>

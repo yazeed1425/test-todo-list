@@ -65,6 +65,8 @@ const helpBtn = document.getElementById("helpBtn");
 const helpModal = document.getElementById("helpModal");
 const closeHelp = document.getElementById("closeHelp");
 const lastSaved = document.getElementById("lastSaved");
+const clearSearch = document.getElementById("clearSearch");
+const clearFilters = document.getElementById("clearFilters");
 
 function loadPrefs() {
   try {
@@ -147,6 +149,24 @@ function openHelp() {
 
 function closeHelpModal() {
   helpModal.hidden = true;
+}
+
+function resetFilters() {
+  filter = "all";
+  categoryFilter = "all";
+  sortBy = "newest";
+  searchQuery = "";
+  searchInput.value = "";
+  sortSelect.value = "newest";
+  savePrefs();
+  renderCategoryFilters();
+  render();
+  showToast("Filters cleared");
+}
+
+function updateSearchClearBtn() {
+  if (!clearSearch) return;
+  clearSearch.hidden = !searchInput.value.trim();
 }
 
 function createId() {
@@ -388,6 +408,7 @@ function render() {
   filterButtons.forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.filter === filter);
   });
+  updateSearchClearBtn();
 }
 
 function startEdit(item, id, input) {
@@ -581,6 +602,7 @@ addForm.addEventListener("submit", (e) => {
 
 searchInput.addEventListener("input", (e) => {
   searchQuery = e.target.value.trim().toLowerCase();
+  updateSearchClearBtn();
   render();
 });
 
@@ -660,6 +682,15 @@ document.querySelectorAll(".quick-date-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
     setQuickDueDate(Number(btn.dataset.days));
   });
+});
+
+clearFilters.addEventListener("click", resetFilters);
+clearSearch.addEventListener("click", () => {
+  searchInput.value = "";
+  searchQuery = "";
+  updateSearchClearBtn();
+  render();
+  searchInput.focus();
 });
 
 helpBtn.addEventListener("click", openHelp);

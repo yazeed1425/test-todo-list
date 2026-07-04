@@ -510,9 +510,13 @@ body {
   color: var(--text-muted);
 }
 
+.search-wrap {
+  position: relative;
+}
+
 .search-wrap input {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
@@ -523,6 +527,27 @@ body {
 
 .search-wrap input:focus {
   border-color: var(--accent);
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.75rem;
+  height: 1.75rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1.125rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.clear-search-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text);
 }
 
 .todo-list {
