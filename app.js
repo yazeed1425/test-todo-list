@@ -1,5 +1,6 @@
 const STORAGE_KEY = "test-todo-list-v2";
 const THEME_KEY = "task-board-theme";
+const PREFS_KEY = "task-board-prefs";
 
 const PRIORITY_ORDER = { high: 0, medium: 1, low: 2 };
 const PRIORITY_LABELS = { low: "Low", medium: "Medium", high: "High" };
@@ -17,9 +18,10 @@ const FILTER_TITLES = {
 };
 
 let todos = loadTodos();
-let filter = "all";
-let categoryFilter = "all";
-let sortBy = "newest";
+const prefs = loadPrefs();
+let filter = prefs.filter || "all";
+let categoryFilter = prefs.categoryFilter || "all";
+let sortBy = prefs.sortBy || "newest";
 let searchQuery = "";
 let deletedBackup = null;
 let undoTimer = null;
@@ -53,6 +55,31 @@ const themeToggle = document.getElementById("themeToggle");
 const toast = document.getElementById("toast");
 const toastMessage = document.getElementById("toastMessage");
 const undoBtn = document.getElementById("undoBtn");
+const exportBtn = document.getElementById("exportBtn");
+const importBtn = document.getElementById("importBtn");
+const importFile = document.getElementById("importFile");
+
+function loadPrefs() {
+  try {
+    const data = localStorage.getItem(PREFS_KEY);
+    return data ? JSON.parse(data) : {};
+  } catch {
+    return {};
+  }
+}
+
+function savePrefs() {
+  localStorage.setItem(
+    PREFS_KEY,
+    JSON.stringify({ filter, categoryFilter, sortBy })
+  );
+}
+
+function isTypingTarget(el) {
+  if (!el) return false;
+  const tag = el.tagName;
+  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable;
+}
 
 function loadTodos() {
   try {
@@ -62,7 +89,9 @@ function loadTodos() {
     const legacy = localStorage.getItem("test-todo-list");
     if (!legacy) return [];
 
-    return normalizeTodos(JSON.parse(legacy));
+    const migrated = normalizeTodos(JSON.parse(legacy));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+    return migrated;
   } catch {
     return [];
   }
@@ -174,6 +203,7 @@ function renderCategoryFilters() {
     btn.textContent = label;
     btn.addEventListener("click", () => {
       categoryFilter = id;
+      savePrefs();
       renderCategoryFilters();
       render();
     });
@@ -256,9 +286,12 @@ function render() {
     item.querySelector(".todo-body").appendChild(editInput);
 
     checkbox.addEventListener("change", () => toggleTodo(todo.id));
-    pinBtn.addEventListener("click", () => togglePin(todo.id));
-    deleteBtn.addEventListener("click", () => deleteTodo(todo.id));
+    editBtn.addEventListener("mousedown", (e) => e.preventDefault());
+    deleteBtn.addEventListener("mousedown", (e) => e.preventDefault());
+    pinBtn.addEventListener("mousedown", (e) => e.preventDefault());
     editBtn.addEventListener("click", () => startEdit(item, todo.id, editInput));
+    deleteBtn.addEventListener("click", () => deleteTodo(todo.id));
+    pinBtn.addEventListener("click", () => togglePin(todo.id));
     editInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") finishEdit(todo.id, editInput, item);
       if (e.key === "Escape") cancelEdit(item, editInput, todo.text);
@@ -266,6 +299,11 @@ function render() {
     editInput.addEventListener("blur", () => finishEdit(todo.id, editInput, item));
 
     todoList.appendChild(node);
+  });
+
+  sortSelect.value = sortBy;
+  filterButtons.forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.filter === filter);
   });
 }
 
@@ -346,15 +384,21 @@ function deleteTodo(id) {
   showUndo("Task deleted");
 }
 
-function showUndo(message) {
+function showToast(message, withUndo = false) {
   clearTimeout(undoTimer);
   toastMessage.textContent = message;
+  undoBtn.hidden = !withUndo;
   toast.hidden = false;
 
   undoTimer = setTimeout(() => {
     toast.hidden = true;
-    deletedBackup = null;
-  }, 5000);
+    undoBtn.hidden = false;
+    if (!withUndo) deletedBackup = null;
+  }, withUndo ? 5000 : 2500);
+}
+
+function showUndo(message) {
+  showToast(message, true);
 }
 
 function undoDelete() {
@@ -377,6 +421,39 @@ function completeAllActive() {
   render();
 }
 
+function exportTodos() {
+  const blob = new Blob([JSON.stringify(todos, null, 2)], {
+    type: "application/json",
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `task-board-${new Date().toISOString().slice(0, 10)}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+  showToast("Tasks exported");
+}
+
+function importTodos(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const imported = normalizeTodos(JSON.parse(reader.result));
+      if (!imported.length) {
+        showToast("Import file has no tasks");
+        return;
+      }
+      todos = imported;
+      saveTodos();
+      render();
+      showToast(`Imported ${imported.length} task${imported.length === 1 ? "" : "s"}`);
+    } catch {
+      showToast("Invalid import file");
+    }
+  };
+  reader.readAsText(file);
+}
+
 addForm.addEventListener("submit", (e) => {
   e.preventDefault();
   addTodo(
@@ -397,7 +474,16 @@ searchInput.addEventListener("input", (e) => {
 
 sortSelect.addEventListener("change", (e) => {
   sortBy = e.target.value;
+  savePrefs();
   render();
+});
+
+exportBtn.addEventListener("click", exportTodos);
+importBtn.addEventListener("click", () => importFile.click());
+importFile.addEventListener("change", (e) => {
+  const file = e.target.files?.[0];
+  if (file) importTodos(file);
+  importFile.value = "";
 });
 
 clearCompleted.addEventListener("click", () => {
@@ -416,15 +502,23 @@ themeToggle.addEventListener("click", toggleTheme);
 filterButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     filter = btn.dataset.filter;
+    savePrefs();
     filterButtons.forEach((b) => b.classList.toggle("active", b === btn));
     render();
   });
 });
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "/" && document.activeElement !== searchInput) {
+  if (isTypingTarget(document.activeElement)) return;
+
+  if (e.key === "/") {
     e.preventDefault();
     searchInput.focus();
+  }
+
+  if (e.key === "n" || e.key === "N") {
+    e.preventDefault();
+    todoInput.focus();
   }
 });
 

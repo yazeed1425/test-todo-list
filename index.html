@@ -65,13 +65,20 @@
       </div>
 
       <div class="sidebar-actions">
+        <button type="button" class="action-btn" id="exportBtn">
+          Export tasks
+        </button>
+        <button type="button" class="action-btn" id="importBtn">
+          Import tasks
+        </button>
+        <input type="file" id="importFile" accept="application/json" hidden />
         <button type="button" class="action-btn" id="completeAll" hidden>
           Complete all active
         </button>
         <button type="button" class="clear-btn" id="clearCompleted" hidden>
           Clear completed
         </button>
-        <p class="hint">Saved in your browser · <kbd>/</kbd> to search</p>
+        <p class="hint">Saved in your browser · <kbd>/</kbd> search · <kbd>N</kbd> new task</p>
       </div>
     </aside>
 
