@@ -724,7 +724,7 @@ clearSearch.addEventListener("click", () => {
 
 helpBtn.addEventListener("click", openHelp);
 closeHelp.addEventListener("click", closeHelpModal);
-helpModal.addEventListener("click", (e) => {
+helpModal.addEventListener("cick", (e) => {
   if (e.target === helpModal) closeHelpModal();
 });
 
