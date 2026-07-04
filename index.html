@@ -54,6 +54,10 @@
           <span>Completed</span>
           <span class="filter-count" id="countCompleted">0</span>
         </button>
+        <button type="button" class="filter" data-filter="due-today">
+          <span>Due today</span>
+          <span class="filter-count" id="countDueToday">0</span>
+        </button>
         <button type="button" class="filter" data-filter="pinned">
           <span>Pinned</span>
           <span class="filter-count" id="countPinned">0</span>
@@ -152,6 +156,7 @@
         </span>
       </label>
       <div class="todo-actions">
+        <button type="button" class="duplicate-btn" aria-label="Duplicate">Copy</button>
         <button type="button" class="edit-btn" aria-label="Edit">Edit</button>
         <button type="button" class="delete-btn" aria-label="Delete">Delete</button>
       </div>

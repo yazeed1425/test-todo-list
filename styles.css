@@ -620,6 +620,7 @@ body {
 }
 
 .edit-btn,
+.duplicate-btn,
 .delete-btn {
   padding: 0.375rem 0.625rem;
   border: 1px solid var(--border);
@@ -630,6 +631,11 @@ body {
   font-weight: 500;
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.duplicate-btn:hover {
+  border-color: var(--success);
+  color: var(--success);
 }
 
 .edit-btn:hover {

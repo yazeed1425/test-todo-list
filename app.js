@@ -15,6 +15,7 @@ const FILTER_TITLES = {
   active: "Active tasks",
   completed: "Completed tasks",
   pinned: "Pinned tasks",
+  "due-today": "Due today",
 };
 
 let todos = loadTodos();
@@ -136,7 +137,21 @@ function matchesSearch(todo) {
   return haystack.includes(searchQuery);
 }
 
-function isOverdue(todo) {
+function getTodayString() {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${today.getFullYear()}-${month}-${day}`;
+}
+
+function setDueDateMin() {
+  dueDateInput.min = getTodayString();
+}
+
+function isDueToday(todo) {
+  if (!todo.dueDate || todo.completed) return false;
+  return todo.dueDate === getTodayString();
+}
   if (!todo.dueDate || todo.completed) return false;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -154,6 +169,7 @@ function getFilteredTodos() {
     if (filter === "active" && todo.completed) return false;
     if (filter === "completed" && !todo.completed) return false;
     if (filter === "pinned" && !todo.pinned) return false;
+    if (filter === "due-today" && !isDueToday(todo)) return false;
     if (categoryFilter !== "all" && todo.category !== categoryFilter) return false;
     return matchesSearch(todo);
   });
@@ -216,6 +232,7 @@ function updateStats() {
   const active = todos.filter((t) => !t.completed).length;
   const done = total - active;
   const pinned = todos.filter((t) => t.pinned).length;
+  const dueToday = todos.filter(isDueToday).length;
   const overdue = todos.filter(isOverdue).length;
   const percent = total ? Math.round((done / total) * 100) : 0;
 
@@ -226,6 +243,8 @@ function updateStats() {
   countActive.textContent = active;
   countCompleted.textContent = done;
   countPinned.textContent = pinned;
+  const countDueToday = document.getElementById("countDueToday");
+  if (countDueToday) countDueToday.textContent = dueToday;
   progressRing.style.setProperty("--progress", percent);
   progressPercent.textContent = `${percent}%`;
   itemCount.textContent = `${active} item${active === 1 ? "" : "s"} left`;
@@ -255,6 +274,7 @@ function render() {
     const badge = node.querySelector(".priority-badge");
     const dueBadge = node.querySelector(".due-badge");
     const editBtn = node.querySelector(".edit-btn");
+    const duplicateBtn = node.querySelector(".duplicate-btn");
     const deleteBtn = node.querySelector(".delete-btn");
 
     item.dataset.id = todo.id;
@@ -287,9 +307,11 @@ function render() {
 
     checkbox.addEventListener("change", () => toggleTodo(todo.id));
     editBtn.addEventListener("mousedown", (e) => e.preventDefault());
+    duplicateBtn.addEventListener("mousedown", (e) => e.preventDefault());
     deleteBtn.addEventListener("mousedown", (e) => e.preventDefault());
     pinBtn.addEventListener("mousedown", (e) => e.preventDefault());
     editBtn.addEventListener("click", () => startEdit(item, todo.id, editInput));
+    duplicateBtn.addEventListener("click", () => duplicateTodo(todo.id));
     deleteBtn.addEventListener("click", () => deleteTodo(todo.id));
     pinBtn.addEventListener("click", () => togglePin(todo.id));
     editInput.addEventListener("keydown", (e) => {
@@ -413,6 +435,24 @@ function undoDelete() {
   render();
 }
 
+function duplicateTodo(id) {
+  const source = todos.find((t) => t.id === id);
+  if (!source) return;
+
+  todos.unshift({
+    ...source,
+    id: createId(),
+    text: `${source.text} (copy)`,
+    completed: false,
+    pinned: false,
+    createdAt: Date.now(),
+  });
+
+  saveTodos();
+  render();
+  showToast("Task duplicated");
+}
+
 function completeAllActive() {
   todos.forEach((todo) => {
     if (!todo.completed) todo.completed = true;
@@ -523,5 +563,6 @@ document.addEventListener("keydown", (e) => {
 });
 
 loadTheme();
+setDueDateMin();
 renderCategoryFilters();
 render();
