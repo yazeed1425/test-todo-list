@@ -67,6 +67,7 @@ const closeHelp = document.getElementById("closeHelp");
 const lastSaved = document.getElementById("lastSaved");
 const clearSearch = document.getElementById("clearSearch");
 const clearFilters = document.getElementById("clearFilters");
+const randomTaskBtn = document.getElementById("randomTask");
 
 function loadPrefs() {
   try {
@@ -167,6 +168,33 @@ function resetFilters() {
 function updateSearchClearBtn() {
   if (!clearSearch) return;
   clearSearch.hidden = !searchInput.value.trim();
+}
+
+function pickRandomTask() {
+  const active = todos.filter((t) => !t.completed);
+  if (!active.length) {
+    showToast("No active tasks to pick");
+    return;
+  }
+
+  const chosen = active[Math.floor(Math.random() * active.length)];
+  filter = "all";
+  categoryFilter = "all";
+  searchQuery = "";
+  searchInput.value = "";
+  savePrefs();
+  renderCategoryFilters();
+  render();
+
+  requestAnimationFrame(() => {
+    const item = todoList.querySelector(`[data-id="${chosen.id}"]`);
+    if (!item) return;
+    item.scrollIntoView({ behavior: "smooth", block: "center" });
+    item.classList.add("highlight");
+    setTimeout(() => item.classList.remove("highlight"), 1800);
+  });
+
+  showToast(`Picked: ${chosen.text}`);
 }
 
 function createId() {
@@ -685,6 +713,7 @@ document.querySelectorAll(".quick-date-btn").forEach((btn) => {
 });
 
 clearFilters.addEventListener("click", resetFilters);
+randomTaskBtn.addEventListener("click", pickRandomTask);
 clearSearch.addEventListener("click", () => {
   searchInput.value = "";
   searchQuery = "";
