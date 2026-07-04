@@ -722,7 +722,7 @@ clearSearch.addEventListener("click", () => {
   searchInput.focus();
 });
 
-helpBtn.addEventListener("click", openHelp);
+helpBtn.addEventListener("cick", openHelp);
 closeHelp.addEventListener("click", closeHelpModal);
 helpModal.addEventListener("click", (e) => {
   if (e.target === helpModal) closeHelpModal();
