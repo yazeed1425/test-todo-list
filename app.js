@@ -16,6 +16,7 @@ const FILTER_TITLES = {
   completed: "Completed tasks",
   pinned: "Pinned tasks",
   "due-today": "Due today",
+  overdue: "Overdue tasks",
 };
 
 let todos = loadTodos();
@@ -152,6 +153,8 @@ function isDueToday(todo) {
   if (!todo.dueDate || todo.completed) return false;
   return todo.dueDate === getTodayString();
 }
+
+function isOverdue(todo) {
   if (!todo.dueDate || todo.completed) return false;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -160,8 +163,18 @@ function isDueToday(todo) {
 
 function formatDueDate(dueDate) {
   if (!dueDate) return "";
+  if (dueDate === getTodayString()) return "Today";
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
+  if (dueDate === tomorrowStr) return "Tomorrow";
   const date = new Date(dueDate + "T00:00:00");
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+function isDuplicateTask(text) {
+  const normalized = text.trim().toLowerCase();
+  return todos.some((t) => !t.completed && t.text.trim().toLowerCase() === normalized);
 }
 
 function getFilteredTodos() {
@@ -170,6 +183,7 @@ function getFilteredTodos() {
     if (filter === "completed" && !todo.completed) return false;
     if (filter === "pinned" && !todo.pinned) return false;
     if (filter === "due-today" && !isDueToday(todo)) return false;
+    if (filter === "overdue" && !isOverdue(todo)) return false;
     if (categoryFilter !== "all" && todo.category !== categoryFilter) return false;
     return matchesSearch(todo);
   });
@@ -244,7 +258,9 @@ function updateStats() {
   countCompleted.textContent = done;
   countPinned.textContent = pinned;
   const countDueToday = document.getElementById("countDueToday");
+  const countOverdue = document.getElementById("countOverdue");
   if (countDueToday) countDueToday.textContent = dueToday;
+  if (countOverdue) countOverdue.textContent = overdue;
   progressRing.style.setProperty("--progress", percent);
   progressPercent.textContent = `${percent}%`;
   itemCount.textContent = `${active} item${active === 1 ? "" : "s"} left`;
@@ -361,6 +377,11 @@ function cancelEdit(item, input, original) {
 function addTodo(text, priority, category, dueDate) {
   const trimmed = text.trim();
   if (!trimmed) return;
+
+  if (isDuplicateTask(trimmed)) {
+    showToast("An active task with this name already exists");
+    return;
+  }
 
   todos.unshift({
     id: createId(),
@@ -512,6 +533,15 @@ searchInput.addEventListener("input", (e) => {
   render();
 });
 
+searchInput.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    searchInput.value = "";
+    searchQuery = "";
+    render();
+    searchInput.blur();
+  }
+});
+
 sortSelect.addEventListener("change", (e) => {
   sortBy = e.target.value;
   savePrefs();
@@ -527,9 +557,13 @@ importFile.addEventListener("change", (e) => {
 });
 
 clearCompleted.addEventListener("click", () => {
+  const doneCount = todos.filter((t) => t.completed).length;
+  if (!doneCount) return;
+  if (!confirm(`Clear ${doneCount} completed task${doneCount === 1 ? "" : "s"}?`)) return;
   todos = todos.filter((t) => !t.completed);
   saveTodos();
   render();
+  showToast("Completed tasks cleared");
 });
 
 completeAll.addEventListener("click", () => {
