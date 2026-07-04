@@ -61,6 +61,10 @@ const undoBtn = document.getElementById("undoBtn");
 const exportBtn = document.getElementById("exportBtn");
 const importBtn = document.getElementById("importBtn");
 const importFile = document.getElementById("importFile");
+const helpBtn = document.getElementById("helpBtn");
+const helpModal = document.getElementById("helpModal");
+const closeHelp = document.getElementById("closeHelp");
+const lastSaved = document.getElementById("lastSaved");
 
 function loadPrefs() {
   try {
@@ -117,6 +121,32 @@ function normalizeTodos(list) {
 
 function saveTodos() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+  updateLastSaved();
+}
+
+function updateLastSaved() {
+  if (!lastSaved) return;
+  const time = new Date().toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+  lastSaved.textContent = `Last saved ${time}`;
+}
+
+function setQuickDueDate(daysFromToday) {
+  const date = new Date();
+  date.setDate(date.getDate() + daysFromToday);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  dueDateInput.value = `${date.getFullYear()}-${month}-${day}`;
+}
+
+function openHelp() {
+  helpModal.hidden = false;
+}
+
+function closeHelpModal() {
+  helpModal.hidden = true;
 }
 
 function createId() {
@@ -619,9 +649,27 @@ document.addEventListener("keydown", (e) => {
     e.preventDefault();
     todoInput.focus();
   }
+
+  if (e.key === "?") {
+    e.preventDefault();
+    openHelp();
+  }
+});
+
+document.querySelectorAll(".quick-date-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    setQuickDueDate(Number(btn.dataset.days));
+  });
+});
+
+helpBtn.addEventListener("click", openHelp);
+closeHelp.addEventListener("click", closeHelpModal);
+helpModal.addEventListener("click", (e) => {
+  if (e.target === helpModal) closeHelpModal();
 });
 
 loadTheme();
 setDueDateMin();
+updateLastSaved();
 renderCategoryFilters();
 render();

@@ -77,6 +77,9 @@
       </div>
 
       <div class="sidebar-actions">
+        <button type="button" class="action-btn" id="helpBtn">
+          Keyboard shortcuts
+        </button>
         <button type="button" class="action-btn" id="exportBtn">
           Export tasks
         </button>
@@ -90,7 +93,8 @@
         <button type="button" class="clear-btn" id="clearCompleted" hidden>
           Clear completed
         </button>
-        <p class="hint">Saved locally · <kbd>/</kbd> search · <kbd>N</kbd> new · <kbd>Esc</kbd> clear</p>
+        <p class="hint">Saved locally · <kbd>/</kbd> search · <kbd>N</kbd> new · <kbd>?</kbd> help</p>
+        <p class="last-saved" id="lastSaved"></p>
       </div>
     </aside>
 
@@ -128,6 +132,10 @@
           <option value="high">High</option>
         </select>
         <input type="date" id="dueDateInput" class="field-date" aria-label="Due date" />
+        <div class="quick-dates">
+          <button type="button" class="quick-date-btn" data-days="0">Today</button>
+          <button type="button" class="quick-date-btn" data-days="1">Tomorrow</button>
+        </div>
         <button type="submit">Add task</button>
       </form>
 
@@ -142,6 +150,21 @@
 
       <ul class="todo-list" id="todoList"></ul>
     </main>
+  </div>
+
+  <div class="modal" id="helpModal" hidden>
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3>Keyboard shortcuts</h3>
+        <button type="button" class="modal-close" id="closeHelp" aria-label="Close">×</button>
+      </header>
+      <ul class="shortcut-list">
+        <li><kbd>/</kbd> Focus search</li>
+        <li><kbd>N</kbd> New task</li>
+        <li><kbd>?</kbd> Show this help</li>
+        <li><kbd>Esc</kbd> Clear search</li>
+      </ul>
+    </div>
   </div>
 
   <div class="toast" id="toast" hidden>
