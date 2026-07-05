@@ -149,7 +149,12 @@ function openHelp() {
 }
 
 function closeHelpModal() {
+  if (!helpModal) return;
   helpModal.hidden = true;
+}
+
+function isHelpOpen() {
+  return helpModal && !helpModal.hidden;
 }
 
 function resetFilters() {
@@ -636,6 +641,10 @@ searchInput.addEventListener("input", (e) => {
 
 searchInput.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
+    if (isHelpOpen()) {
+      closeHelpModal();
+      return;
+    }
     searchInput.value = "";
     searchQuery = "";
     render();
@@ -688,6 +697,12 @@ filterButtons.forEach((btn) => {
 });
 
 document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && isHelpOpen()) {
+    e.preventDefault();
+    closeHelpModal();
+    return;
+  }
+
   if (isTypingTarget(document.activeElement)) return;
 
   if (e.key === "/") {
@@ -700,9 +715,10 @@ document.addEventListener("keydown", (e) => {
     todoInput.focus();
   }
 
-  if (e.key === "?") {
+  if (e.key === "?" || (e.key === "/" && e.shiftKey)) {
     e.preventDefault();
-    openHelp();
+    if (isHelpOpen()) closeHelpModal();
+    else openHelp();
   }
 });
 
@@ -723,9 +739,21 @@ clearSearch.addEventListener("click", () => {
 });
 
 helpBtn.addEventListener("click", openHelp);
+<<<<<<< Updated upstream
 closeHelp.addEventListener("click", closeHelpModal);
 helpModal.addEventListener("cick", (e) => {
+=======
+closeHelp.addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  closeHelpModal();
+});
+helpModal.addEventListener("click", (e) => {
+>>>>>>> Stashed changes
   if (e.target === helpModal) closeHelpModal();
+});
+helpModal.querySelector(".modal-card")?.addEventListener("click", (e) => {
+  e.stopPropagation();
 });
 
 loadTheme();
