@@ -739,17 +739,12 @@ clearSearch.addEventListener("click", () => {
 });
 
 helpBtn.addEventListener("click", openHelp);
-<<<<<<< Updated upstream
-closeHelp.addEventListener("click", closeHelpModal);
-helpModal.addEventListener("cick", (e) => {
-=======
 closeHelp.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
   closeHelpModal();
 });
 helpModal.addEventListener("click", (e) => {
->>>>>>> Stashed changes
   if (e.target === helpModal) closeHelpModal();
 });
 helpModal.querySelector(".modal-card")?.addEventListener("click", (e) => {
