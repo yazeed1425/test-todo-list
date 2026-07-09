@@ -4,7 +4,7 @@ const PREFS_KEY = "task-board-prefs";
 //hey
 const PRIORITY_ORDER = { high: 0, medium: 1, low: 2 };
 const PRIORITY_LABELS = { low: "Low", medium: "Medium", high: "High" };
-const CATEGORY_LABELS = {
+const CATEGORY_LABELS = 
   work: "Work",
   personal: "Personal",
   shopping: "Shopping",
