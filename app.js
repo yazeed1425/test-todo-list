@@ -8,7 +8,7 @@ const CATEGORY_LABELS =
   work: "Work",
   personal: "Personal",
   shopping: "Shopping",
-  other: "Other",
+  other: "Othe
 };
 const FILTER_TITLES = {
   all: "All tasks",
